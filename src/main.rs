@@ -12,9 +12,9 @@ fn main() {
     
     // Write to Chunk
     let constant: usize = chunk.add_constant(1.2);
-    chunk.write_chunk(OpConstant as u8);
-    chunk.write_chunk(constant as u8);
-    chunk.write_chunk(OpReturn as u8);
+    chunk.write_chunk(OpConstant as u8, 1);
+    chunk.write_chunk(constant as u8, 1);
+    chunk.write_chunk(OpReturn as u8, 1);
     
     // Chunk Deallocate
     disassemble_chunk(&chunk, "Chunk")

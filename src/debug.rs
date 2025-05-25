@@ -26,14 +26,30 @@ fn disassemble_instructions(chunk: &Chunk, offset: usize) -> usize {
     }
 }
 
-fn simple_instruction(name: &str, _chunk: &Chunk, offset: usize) -> usize {
-    println!("{:04x} {}", offset, name);
+fn simple_instruction(name: &str, chunk: &Chunk, offset: usize) -> usize {
+    let line: u32 = chunk.lines[offset];
+    
+    if offset > 0 && line == chunk.lines[offset - 1] {
+        println!("{:04x} | {}", offset, name);
+    } else {
+        println!("{:04x} {} {}", offset, line, name);
+    }
+   
     offset + 1
 }
 
 fn constant_instruction(name: &str, chunk: &Chunk, offset: usize) -> usize {
     let constant_index = chunk.code[offset + 1] as usize;
     let constant = chunk.constants.get(constant_index);
-    println!("{:04x} {} {}", offset, name, constant);
+    let line: u32 = chunk.lines[offset];
+
+    if offset > 0 && chunk.lines[offset] == chunk.lines[offset - 1] {
+        println!("{:04x} | {} {}", offset, line, constant);
+    } else {
+        println!("{:04x} {} {} {}", offset, line, name, constant);
+    } 
+    
+    
+    
     offset + 2
 }
