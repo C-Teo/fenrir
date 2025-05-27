@@ -27,9 +27,9 @@ fn disassemble_instructions(chunk: &Chunk, offset: usize) -> usize {
 }
 
 fn simple_instruction(name: &str, chunk: &Chunk, offset: usize) -> usize {
-    let line: u32 = chunk.lines[offset];
+    let line: u32 = get_line(chunk, offset as u32);
     
-    if offset > 0 && line == chunk.lines[offset - 1] {
+    if offset > 0 && line == get_line(chunk, (offset - 1) as u32) {
         println!("{:04x} | {}", offset, name);
     } else {
         println!("{:04x} {} {}", offset, line, name);
@@ -41,7 +41,7 @@ fn simple_instruction(name: &str, chunk: &Chunk, offset: usize) -> usize {
 fn constant_instruction(name: &str, chunk: &Chunk, offset: usize) -> usize {
     let constant_index = chunk.code[offset + 1] as usize;
     let constant = chunk.constants.get(constant_index);
-    let line: u32 = chunk.lines[offset];
+    let line: u32 = get_line(chunk, offset as u32);
 
     if offset > 0 && chunk.lines[offset] == chunk.lines[offset - 1] {
         println!("{:04x} | {} {}", offset, line, constant);
@@ -49,7 +49,16 @@ fn constant_instruction(name: &str, chunk: &Chunk, offset: usize) -> usize {
         println!("{:04x} {} {} {}", offset, line, name, constant);
     } 
     
-    
-    
     offset + 2
+}
+
+fn get_line(chunk: &Chunk, mut offset: u32) -> u32 { 
+    for (line, occurences) in &chunk.lines {
+        if *occurences < offset + 1 {
+            offset -= *occurences
+        } else {
+            return *line;
+        }
+    }
+    0
 }

@@ -3,7 +3,7 @@ use crate::value::{Value, ValueArray};
 #[derive(Debug)]
 pub struct Chunk {
     pub code: Vec<u8>,
-    pub lines: Vec<u32>,
+    pub lines: Vec<(u32,u32)>,
     pub constants: ValueArray,
 }
 
@@ -15,10 +15,18 @@ impl Chunk {
             constants: ValueArray::new(),
         }
     }
-    
+
     pub fn write_chunk(&mut self, byte: u8, line: u32) {
         self.code.push(byte);
-        self.lines.push(line);
+
+        if let Some((last_line, count)) = self.lines.last_mut() {
+            if *last_line == line {
+                *count += 1;
+                return;
+            }
+        }
+        
+        self.lines.push((line, 1));
     }
     
     pub fn add_constant(&mut self, value: Value) -> usize {
